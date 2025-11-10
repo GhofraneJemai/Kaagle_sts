@@ -13,23 +13,25 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
-@Configuration
 public class RagDocumentIndexor {
-	@Value("classpath:/pdfs/cv.pdf")
+
+    @Value("classpath:/pdfs/cv.pdf")
     private Resource pdfResource;
+
     @Value("store.json")
     private String storeFileName;
+
     @Bean
     public SimpleVectorStore getVectorStore(EmbeddingModel embeddingModel) {
         SimpleVectorStore vectorStore = SimpleVectorStore.builder(embeddingModel).build();
-        Path path = Paths.get("src","main","resources","store");
+        Path path = Paths.get("src", "main", "resources", "store");
         File file = new File(path.toFile(), storeFileName);
-        if(!file.exists()) {
+
+        if (!file.exists()) {
             PagePdfDocumentReader reader = new PagePdfDocumentReader(pdfResource);
             List<Document> documents = reader.get();
             TextSplitter textSplitter = new TokenTextSplitter();
@@ -39,6 +41,7 @@ public class RagDocumentIndexor {
         } else {
             vectorStore.load(file);
         }
+
         return vectorStore;
     }
 }
